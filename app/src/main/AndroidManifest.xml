@@ -18,7 +18,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PostDetails"></activity>
+        <activity android:name=".PostDetails" />
+        <activity android:name=".UserDetails"></activity>
     </application>
 
 </manifest>

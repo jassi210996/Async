@@ -1,6 +1,7 @@
 package com.example.kingj.async;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,29 +13,31 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.jar.JarInputStream;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class AsyncPost extends AsyncTask<String,Void,ArrayList<String>>{
+public class AsyncPost extends AsyncTask<String,Void,ArrayList<Post>>{
 
 
     PostDownloadListner listner;
+
 
     AsyncPost(PostDownloadListner listner){
         this.listner=listner;
     }
 
     @Override
-    protected ArrayList<String> doInBackground(String... strings) {
+    protected ArrayList<Post> doInBackground(String... strings) {
 
-        ArrayList<String> titles = new ArrayList<>();
+        ArrayList<Post> titles = new ArrayList<>();
         String urlString = strings[0];
 
         try {
             URL url = new URL(urlString);
             HttpsURLConnection urlConnection =(HttpsURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
+
+            Log.v("id we get"," = ");
 
             urlConnection.connect();
 
@@ -52,9 +55,23 @@ public class AsyncPost extends AsyncTask<String,Void,ArrayList<String>>{
 
             for(int i=0;i<root.length();i++)
             {
+                Post post = new Post();
                 JSONObject postObject = root.getJSONObject(i);
+
                 String title = postObject.getString("title");
-                titles.add(title);
+                post.setPost_title(title);
+
+                long id = postObject.getLong("id");
+                post.setPost_id(id);
+
+                long user_id = postObject.getInt("userId");
+                post.setUser_id(user_id);
+
+                String body = postObject.getString("body");
+                post.setBody(body);
+
+
+                titles.add(post);
             }
 
 
@@ -70,7 +87,7 @@ public class AsyncPost extends AsyncTask<String,Void,ArrayList<String>>{
     }
 
     @Override
-    protected void onPostExecute(ArrayList<String> strings) {
+    protected void onPostExecute(ArrayList<Post> strings) {
         super.onPostExecute(strings);
         listner.postDownload(strings);
     }

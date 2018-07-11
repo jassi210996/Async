@@ -15,21 +15,20 @@ import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class CommentsAsync extends AsyncTask<String,Void,ArrayList<String>> {
+public class UserAsync extends AsyncTask<String,Void,User> {
 
+    UserListner listner;
 
-    PostDetailListner listner;
-
-    CommentsAsync(PostDetailListner listner)
-    {
+    UserAsync(UserListner listner){
         this.listner=listner;
     }
 
     @Override
-    protected ArrayList<String> doInBackground(String... strings) {
+    protected User doInBackground(String... strings) {
 
-        ArrayList<String> comments = new ArrayList<>();
+//        ArrayList<User> details = new ArrayList<>();
         String urlString = strings[0];
+        User user = new User();
 
         try{
 
@@ -49,16 +48,20 @@ public class CommentsAsync extends AsyncTask<String,Void,ArrayList<String>> {
                 result=result+scanner.next();
             }
 
-            JSONArray rootArray = new JSONArray(result);
 
-            for(int i=0;i<rootArray.length();i++)
-            {
-                JSONObject jsonObject =  rootArray.getJSONObject(i);
+            JSONObject jsonObject = new JSONObject(result);
 
-                String comment=jsonObject.getString("email");
 
-                comments.add(comment);
-            }
+            long id=jsonObject.getLong("id");
+            user.setUid(id);
+            String name=jsonObject.getString("name");
+            user.setUname(name);
+            String username=jsonObject.getString("username");
+            user.setUserName(username);
+            String email=jsonObject.getString("email");
+            user.setEmail(email);
+
+//            details.add(user);
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -68,12 +71,12 @@ public class CommentsAsync extends AsyncTask<String,Void,ArrayList<String>> {
             e.printStackTrace();
         }
 
-        return comments;
+        return user;
     }
 
     @Override
-    protected void onPostExecute(ArrayList<String> strings) {
-        super.onPostExecute(strings);
-        listner.onDetailsDownload(strings);
+    protected void onPostExecute(User users) {
+        super.onPostExecute(users);
+        listner.userDownload(users);
     }
 }
